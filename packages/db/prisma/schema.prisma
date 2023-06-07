@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -11,10 +10,87 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Data {
-    id   String @id @default(auto()) @map("_id") @db.ObjectId
-    node Json
-    edge Json
+model MindMap {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+
+    nodes Node[]
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @db.ObjectId
+}
+
+model Node {
+    id   String @id @default(cuid()) @map("_id")
+    type String
+
+    data     NodeData?
+    position NodePosition?
+    // style    NodeStyle?
+
+    sourceEdge Edge[] @relation("source")
+    targetEdge Edge[] @relation("target")
+
+    mindMap   MindMap? @relation(fields: [mindMapId], references: [id], onDelete: Cascade)
+    mindMapId String?  @db.ObjectId
+}
+
+model NodePosition {
+    id String @id @default(cuid()) @map("_id")
+    x  Int
+    y  Int
+
+    node   Node   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+    nodeId String @unique
+}
+
+model NodeData {
+    id    String @id @default(cuid()) @map("_id")
+    label String
+
+    node   Node   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+    nodeId String @unique
+}
+
+// model NodeStyle {
+//     id String @id @default(cuid()) @map("_id")
+//     background String
+//     color      String
+
+//     node   Node   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+//     nodeId String @unique
+// }
+
+model Edge {
+    id    String @id @default(cuid()) @map("_id")
+    label String
+    // type  String
+    // animated Boolean
+
+    data  EdgeData?
+    style EdgeStyle?
+
+    sourceNode Node   @relation("source", fields: [source], references: [id], onDelete: Cascade)
+    source     String
+    targetNode Node   @relation("target", fields: [target], references: [id], onDelete: Cascade)
+    target     String
+}
+
+model EdgeData {
+    id    String @id @default(cuid()) @map("_id")
+    label String
+
+    node   Edge   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+    nodeId String @unique
+}
+
+model EdgeStyle {
+    id         String @id @default(cuid()) @map("_id")
+    background String
+    color      String
+
+    node   Edge   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+    nodeId String @unique
 }
 
 // NextAuth.js Models
@@ -23,7 +99,6 @@ model Data {
 // @see https://next-auth.js.org/schemas/models
 model Account {
     id                String  @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String  @db.ObjectId
     type              String
     provider          String
     providerAccountId String
@@ -34,7 +109,9 @@ model Account {
     scope             String?
     id_token          String? // @db.Text
     session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @db.ObjectId
 
     @@unique([provider, providerAccountId])
 }
@@ -42,9 +119,10 @@ model Account {
 model Session {
     id           String   @id @default(auto()) @map("_id") @db.ObjectId
     sessionToken String   @unique
-    userId       String   @db.ObjectId
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @db.ObjectId
 }
 
 model User {
@@ -53,8 +131,11 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    accounts      Account[]
-    sessions      Session[]
+
+    accounts Account[]
+    sessions Session[]
+
+    mindMap MindMap[]
 }
 
 model VerificationToken {
@@ -64,4 +145,11 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+generator zod {
+    provider         = "zod-prisma-types"
+    output           = "../zod"
+    createInputTypes = true
+    useMultipleFiles = true
 }
