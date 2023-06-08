@@ -18,6 +18,7 @@ const config = {
   ],
   tailwindConfig: "./packages/config/tailwind",
   importOrder: [
+    "<BUILTIN_MODULES>",
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
     "^(next/(.*)$)|^(next$)",
     "^(expo(.*)$)|^(expo$)",
@@ -31,12 +32,8 @@ const config = {
     "^~/(.*)$",
     "^[./]",
   ],
-  importOrderSeparation: false,
-  importOrderSortSpecifiers: true,
-  importOrderBuiltinModulesToTop: true,
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
-  importOrderMergeDuplicateImports: true,
-  importOrderCombineTypeAndValueImports: true,
+  importOrderTypeScriptVersion: "5.0.0"
 };
 
 module.exports = config;
