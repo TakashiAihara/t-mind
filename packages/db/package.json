@@ -1,9 +1,9 @@
 {
   "name": "@acme/db",
   "version": "0.1.0",
+  "license": "MIT",
   "main": "./index.ts",
   "types": "./index.ts",
-  "license": "MIT",
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "db:generate": "rimraf zod; pnpm with-env prisma generate",
@@ -12,11 +12,12 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@prisma/client": "^4.14.1"
+    "@prisma/client": "^4.15.0"
   },
   "devDependencies": {
     "dotenv-cli": "^7.2.1",
-    "prisma": "^4.14.1",
-    "typescript": "^5.0.4"
+    "prisma": "^4.15.0",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.3"
   }
 }
