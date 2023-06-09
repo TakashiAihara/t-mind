@@ -18,10 +18,5 @@
     "superjson": "1.12.3",
     "zod": "^3.21.4",
     "zod-prisma-types": "^2.7.1"
-  },
-  "devDependencies": {
-    "@acme/eslint-config": "^0.1.0",
-    "eslint": "^8.42.0",
-    "typescript": "^5.1.3"
   }
 }
